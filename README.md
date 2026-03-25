@@ -1,21 +1,27 @@
-# SoccerBet
+# Auto Trip AI
 
-A multi-user soccer betting app for friend groups. Uses a parimutuel system with 0% house edge — odds are determined entirely by how other users bet.
+AI-powered travel itinerary planner for Japan. Enter your origin, destination, and travel conditions — the app generates four distinct plans (fastest, cheapest, relaxed, sightseeing) using Claude AI.
 
 ## Features
 
-- Browse upcoming matches from major European leagues (Premier League, Champions League, La Liga, Bundesliga, Serie A, Ligue 1)
-- Place, modify, and cancel bets before kickoff
-- Real-time parimutuel odds that update as bets are placed
-- Bet history with payout tracking
-- Admin panel to sync match data and settle results
+- Input travel conditions: origin/destination, number of days, transport mode, luggage level, and freeform notes
+- AI parses freeform notes into structured preferences (walking tolerance, pace, budget, etc.)
+- Four plan types generated in parallel via Claude Haiku:
+  - **Fastest** — minimize travel time and transfers
+  - **Cheapest** — minimize total cost
+  - **Relaxed** — account for luggage and physical load
+  - **Sightseeing** — maximize tourist spots
+- Per-plan detail view with a day-by-day timeline (spots, transit legs, meals, hotels)
+- Google Maps links on every transit leg
+- AI replanning: modify any plan with a freeform request
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- A free API key from [football-data.org](https://www.football-data.org/)
+- A [Supabase](https://supabase.com/) project
+- An [Anthropic](https://console.anthropic.com/) API key
 
 ### Setup
 
@@ -25,14 +31,22 @@ A multi-user soccer betting app for friend groups. Uses a parimutuel system with
 npm install
 ```
 
-2. Create a `.env.local` file:
+2. Apply the database schema in your Supabase SQL editor:
 
-```env
-FOOTBALL_DATA_API_KEY=your_api_key_here
-SESSION_SECRET=your-secret-string-here
+```bash
+# Run the contents of supabase/schema.sql
 ```
 
-3. Run the development server:
+3. Create a `.env.local` file:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+ANTHROPIC_API_KEY=sk-ant-...
+SESSION_SECRET=a-long-random-string
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
@@ -44,89 +58,87 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 On first run, an admin account is created automatically:
 
-| Username | Password  |
-|----------|-----------|
+| Username | Password   |
+|----------|------------|
 | `admin`  | `admin123` |
 
 **Change this password before deploying.**
 
 ## Usage
 
-### For Users
+1. Register or log in
+2. Click **新しい旅行を計画する** on the home screen
+3. Fill in the travel conditions form and submit
+4. Wait 30–60 seconds while AI generates four plans
+5. Click any plan card to view the full day-by-day schedule
+6. Use the **再設計** form at the bottom of a plan to request changes
 
-1. Register an account — you start with ¥50,000 balance
-2. Browse matches on the home screen
-3. Click a match to place a bet on home win, draw, or away win
-4. Odds shown are parimutuel: they reflect the current pool distribution
-5. You can modify or cancel bets any time before kickoff
-6. Winnings are credited automatically when an admin settles the match
-
-### For Admins
-
-1. Log in with the admin account
-2. Go to `/admin`
-3. Click **Sync Matches** to fetch upcoming matches from the API
-4. After a match ends, click **Settle** and select the result
-5. Payouts are calculated and credited to winners automatically
-
-## How Parimutuel Betting Works
-
-All bets on a match go into a shared pool. Winning bettors split that pool proportionally to their wager.
+## Screen Flow
 
 ```
-odds = totalPool / pool[selection]
-payout = floor(amount × odds)
+/ (trip list)
+└── /trips/new          ← condition input form
+└── /trips/:id/plans    ← four plan cards (AI generation happens here)
+    └── /trips/:id/plans/:planId  ← timeline detail + replan form
 ```
-
-House edge is 0%, so the total payout equals the total pool. This is designed for casual use among friends.
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS 4 |
-| Database | SQLite via better-sqlite3 |
-| Auth | HMAC-signed session cookies |
-| Match Data | football-data.org API v4 |
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Framework  | Next.js 16 (App Router, Suspense)   |
+| Language   | TypeScript                          |
+| Styling    | Tailwind CSS 4                      |
+| Database   | Supabase (PostgreSQL)               |
+| Auth       | HMAC-signed session cookies         |
+| AI         | Claude Haiku 4.5 (Anthropic SDK)    |
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── actions/        # Server actions (auth, betting, admin)
-│   ├── admin/          # Admin dashboard page
-│   ├── login/          # Login page
-│   ├── register/       # Registration page
-│   └── page.tsx        # Home page (matches + bet history)
-├── components/         # React components
-│   ├── MatchList.tsx
-│   ├── MatchCard.tsx
-│   ├── BetModal.tsx
-│   ├── BetHistory.tsx
-│   └── AdminPanel.tsx
+│   ├── actions/
+│   │   └── trips.ts          # createTrip, replanTripAction server actions
+│   ├── api/
+│   │   ├── trips/            # REST-style API routes
+│   │   └── plans/
+│   ├── trips/
+│   │   └── [tripId]/
+│   │       └── plans/
+│   │           ├── page.tsx  # Plan list + AI generation (Suspense streaming)
+│   │           └── [planId]/
+│   │               └── page.tsx  # Plan detail with timeline
+│   ├── login/
+│   ├── register/
+│   └── page.tsx              # Home (trip list)
+├── components/
+│   ├── TripForm.tsx          # Condition input form
+│   ├── PlanCard.tsx          # Plan summary card
+│   ├── ScheduleTimeline.tsx  # Day-by-day itinerary view
+│   ├── ReplanForm.tsx        # AI replan request UI
+│   └── Header.tsx
 └── lib/
-    ├── db.ts           # SQLite schema and helpers
-    ├── session.ts      # Cookie session management
-    ├── parimutuel.ts   # Odds calculation
-    └── football.ts     # Football-Data API client
+    ├── ai.ts                 # Claude API: parseUserIntent, generateTripPlans, replanTrip
+    ├── db.ts                 # Supabase client (lazy proxy) + TypeScript types
+    └── session.ts            # Cookie session management
 ```
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `FOOTBALL_DATA_API_KEY` | Yes | API key from football-data.org |
-| `SESSION_SECRET` | Yes (prod) | Secret for HMAC session signing |
+| Variable            | Required | Description                              |
+|---------------------|----------|------------------------------------------|
+| `SUPABASE_URL`      | Yes      | Your Supabase project URL                |
+| `SUPABASE_ANON_KEY` | Yes      | Supabase anon/public key                 |
+| `ANTHROPIC_API_KEY` | Yes      | Anthropic API key for Claude Haiku       |
+| `SESSION_SECRET`    | Yes      | Secret for HMAC session cookie signing   |
 
-## Deployment
+## AI Cost Estimate
 
-This app uses a local SQLite file (`data.db`). For deployment, ensure:
+Each trip generation calls Claude Haiku 4.5 four times in parallel (one per plan type).
 
-1. The process has write access to the project root (for `data.db`)
-2. `SESSION_SECRET` is set to a strong random value
-3. `FOOTBALL_DATA_API_KEY` is configured
+| Model         | Cost per trip (approx.) |
+|---------------|------------------------|
+| Claude Haiku  | ~¥6 (~$0.04)           |
 
-For Vercel or other ephemeral filesystems, replace `better-sqlite3` with a persistent database (e.g., Turso, PlanetScale).
+Replanning calls one additional Haiku request.

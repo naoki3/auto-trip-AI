@@ -198,12 +198,13 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
         if (content.type !== 'text') return null;
         const jsonMatch = content.text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
-          console.error(`[ai] no JSON found for ${type}`);
+          console.error(`[ai] no JSON found for ${type}. Raw:`, content.text.slice(0, 300));
           return null;
         }
         return JSON.parse(jsonMatch[0]) as AIPlan;
       } catch (e) {
         console.error(`[ai] error for ${type}:`, e);
+        console.error(`[ai] raw (last 200):`, content?.text?.slice(-200));
         return null;
       }
     })

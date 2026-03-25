@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { supabase } from '@/lib/db';
 import { getSession } from '@/lib/session';
-import { parseUserIntent, generateTripPlans, replanTrip, AIPlan } from '@/lib/ai';
+import { parseUserIntent, replanTrip, AIPlan } from '@/lib/ai';
 
 async function savePlan(tripId: string, plan: AIPlan): Promise<string> {
   const planId = crypto.randomUUID();
@@ -89,20 +89,6 @@ export async function createTrip(formData: FormData) {
     parsed_json: JSON.stringify(preferences),
     created_at: new Date().toISOString(),
   });
-
-  // Fetch the trip row for AI generation
-  const { data: trip } = await supabase
-    .from('trips')
-    .select('*')
-    .eq('id', tripId)
-    .single();
-
-  if (trip) {
-    const plans = await generateTripPlans(trip, preferences);
-    for (const plan of plans) {
-      await savePlan(tripId, plan);
-    }
-  }
 
   redirect(`/trips/${tripId}/plans`);
 }

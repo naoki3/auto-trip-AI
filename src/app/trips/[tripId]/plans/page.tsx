@@ -6,6 +6,7 @@ import { getSession } from '@/lib/session';
 import { supabase } from '@/lib/db';
 import Header from '@/components/Header';
 import PlanCard from '@/components/PlanCard';
+import PlanGenerator from '@/components/PlanGenerator';
 
 interface Props {
   params: Promise<{ tripId: string }>;
@@ -71,11 +72,7 @@ async function PlansContent({ tripId, userId }: { tripId: string; userId: string
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-500 bg-white rounded-xl border">
-          <p className="text-3xl mb-3">⏳</p>
-          <p className="font-medium">プランを生成中です...</p>
-          <p className="text-sm mt-1">しばらくしてからページを更新してください</p>
-        </div>
+        <PlanGenerator tripId={tripId} />
       )}
     </>
   );

@@ -191,7 +191,7 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
       let rawText = '';
       try {
         const message = await client.messages.create({
-          model: 'claude-sonnet-4-6',
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: 16000,
           messages: [{ role: 'user', content: makePrompt(type, description) }],
         });
@@ -225,7 +225,7 @@ export async function replanTrip(
   const [parsedConditions, replanMessage] = await Promise.all([
     parseUserIntent(userRequest),
     client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 8192,
       messages: [
         {

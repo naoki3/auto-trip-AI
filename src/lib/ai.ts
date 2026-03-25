@@ -195,6 +195,7 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
           max_tokens: 16000,
           messages: [{ role: 'user', content: makePrompt(type, description) }],
         });
+        console.log(`[ai] ${type} stop_reason:`, message.stop_reason, 'output_tokens:', message.usage?.output_tokens);
         const content = message.content[0];
         if (content.type !== 'text') return null;
         rawText = content.text;

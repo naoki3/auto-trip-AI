@@ -115,13 +115,14 @@ export async function generateTripPlans(
     .filter(Boolean)
     .join(', ');
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 8192,
-    messages: [
-      {
-        role: 'user',
-        content: `あなたは日本の旅行プランナーです。以下の条件で4種類の旅程プランをJSON形式で生成してください。
+  const PLAN_TYPES: Array<{ type: AIPlan['plan_type']; description: string }> = [
+    { type: 'fastest', description: '移動時間が最短、乗り換えや待ち時間を最小化' },
+    { type: 'cheapest', description: '総費用が最安、交通費・入場料などを節約' },
+    { type: 'relaxed', description: `荷物や体力を考慮しゆったりした旅程（荷物レベル「${luggageLabel}」を特に考慮）` },
+    { type: 'sightseeing', description: '観光スポットを多く含む充実プラン' },
+  ];
+
+  const makePrompt = (planType: string, planDescription: string) => `あなたは日本の旅行プランナーです。以下の条件で旅程プランを1つJSON形式で生成してください。
 
 ## 旅行条件
 - 出発地: ${trip.origin}
@@ -132,87 +133,85 @@ export async function generateTripPlans(
 ${trip.optional_note ? `- 希望・メモ: ${trip.optional_note}` : ''}
 ${prefLines ? `- 追加条件: ${prefLines}` : ''}
 
-## 出力形式
-以下のJSONを正確に返してください（コードブロック不要、JSONのみ）:
+## プランタイプ
+"${planType}": ${planDescription}
 
-[
-  {
-    "plan_type": "fastest",
-    "summary": "最短ルートの概要（1〜2文）",
-    "estimated_cost": 12000,
-    "transfer_count": 1,
-    "walking_score": 5,
-    "days": [
-      {
-        "day_number": 1,
-        "title": "1日目タイトル",
-        "items": [
-          {
-            "item_type": "move",
-            "start_time": "08:00",
-            "end_time": "09:30",
-            "title": "移動タイトル",
-            "metadata_json": {
-              "from": "出発地",
-              "to": "到着地",
-              "method": "train",
-              "duration_minutes": 90,
-              "price": 1500,
-              "transfer_count": 1,
-              "notes": "備考",
-              "gmaps_url": "https://www.google.com/maps/dir/出発地/到着地/"
-            }
-          },
-          {
-            "item_type": "spot",
-            "start_time": "10:00",
-            "end_time": "11:30",
-            "title": "スポット名",
-            "metadata_json": {
-              "description": "説明",
-              "address": "住所",
-              "gmaps_url": "https://www.google.com/maps/search/スポット名/"
-            }
+## 出力形式（JSONのみ、コードブロック不要）
+{
+  "plan_type": "${planType}",
+  "summary": "プランの概要（1〜2文）",
+  "estimated_cost": 12000,
+  "transfer_count": 1,
+  "walking_score": 5,
+  "days": [
+    {
+      "day_number": 1,
+      "title": "1日目タイトル",
+      "items": [
+        {
+          "item_type": "move",
+          "start_time": "08:00",
+          "end_time": "09:30",
+          "title": "移動タイトル",
+          "metadata_json": {
+            "from": "出発地",
+            "to": "到着地",
+            "method": "train",
+            "duration_minutes": 90,
+            "price": 1500,
+            "transfer_count": 1,
+            "notes": "備考",
+            "gmaps_url": "https://www.google.com/maps/dir/出発地/到着地/"
           }
-        ]
-      }
-    ]
-  }
-]
-
-## 4種類のプランタイプ
-1. "fastest": 移動時間が最短、乗り換えや待ち時間を最小化
-2. "cheapest": 総費用が最安、交通費・入場料などを節約
-3. "relaxed": 荷物や体力を考慮し、ゆったりした旅程（荷物レベル「${luggageLabel}」を特に考慮）
-4. "sightseeing": 観光スポットを多く含む充実プラン
+        },
+        {
+          "item_type": "spot",
+          "start_time": "10:00",
+          "end_time": "11:30",
+          "title": "スポット名",
+          "metadata_json": {
+            "description": "説明",
+            "gmaps_url": "https://www.google.com/maps/search/スポット名/"
+          }
+        }
+      ]
+    }
+  ]
+}
 
 ## ルール
-- 移動ブロック（move）は必ず前後のスポット間に入れること
-- 重い荷物の場合はコインロッカーや荷物預かりの提案（luggageアイテム）を含めること
+- 各日の移動ブロック（move）はスポット間に必ず入れること
+- 重い荷物の場合はコインロッカーや荷物預かり（luggageアイテム）を含めること
 - gmaps_urlはGoogle Maps形式で実際に機能するURLを生成すること
 - 時刻は現実的な所要時間を考慮すること
-- JSONのみ返してください`,
-      },
-    ],
-  });
+- JSONオブジェクトのみ返してください（配列ではなく）`;
 
-  const content = message.content[0];
-  if (content.type !== 'text') return [];
+  const results = await Promise.all(
+    PLAN_TYPES.map(async ({ type, description }) => {
+      const message = await client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8192,
+        messages: [{ role: 'user', content: makePrompt(type, description) }],
+      });
+      const content = message.content[0];
+      if (content.type !== 'text') return null;
+      try {
+        const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          console.error(`[ai] no JSON found for ${type}`);
+          return null;
+        }
+        return JSON.parse(jsonMatch[0]) as AIPlan;
+      } catch (e) {
+        console.error(`[ai] parse error for ${type}:`, e);
+        return null;
+      }
+    })
+  );
 
-  console.log('[ai] raw response (first 500):', content.text.slice(0, 500));
-  try {
-    const jsonMatch = content.text.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-      console.error('[ai] no JSON array found in response');
-      return [];
-    }
-    const parsed = JSON.parse(jsonMatch[0]) as AIPlan[];
-    console.log('[ai] parsed plans:', parsed.length);
-    return parsed;
-  } catch (e) {
-    console.error('[ai] JSON parse error:', e);
-    return [];
-  }
+  const plans = results.filter((p): p is AIPlan => p !== null);
+  console.log('[ai] generated plans:', plans.map(p => p.plan_type));
+  return plans;
 }
 
 export async function replanTrip(

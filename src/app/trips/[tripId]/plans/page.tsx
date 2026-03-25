@@ -113,7 +113,7 @@ async function PlansContent({ tripId, trip }: { tripId: string; trip: Record<str
       .eq('trip_id', tripId)
       .single();
 
-    let generated;
+    let generated: AIPlan[] = [];
     try {
       generated = await generateTripPlans(trip as never, prefData ?? {});
       console.log('[generate] result count:', generated.length, generated.map(p => p.plan_type));

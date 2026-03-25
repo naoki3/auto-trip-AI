@@ -188,14 +188,14 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
 
   const results = await Promise.all(
     PLAN_TYPES.map(async ({ type, description }) => {
-      const message = await client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8192,
-        messages: [{ role: 'user', content: makePrompt(type, description) }],
-      });
-      const content = message.content[0];
-      if (content.type !== 'text') return null;
       try {
+        const message = await client.messages.create({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 8192,
+          messages: [{ role: 'user', content: makePrompt(type, description) }],
+        });
+        const content = message.content[0];
+        if (content.type !== 'text') return null;
         const jsonMatch = content.text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           console.error(`[ai] no JSON found for ${type}`);
@@ -203,7 +203,7 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
         }
         return JSON.parse(jsonMatch[0]) as AIPlan;
       } catch (e) {
-        console.error(`[ai] parse error for ${type}:`, e);
+        console.error(`[ai] error for ${type}:`, e);
         return null;
       }
     })

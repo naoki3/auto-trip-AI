@@ -1,0 +1,107 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { replanTripAction } from '@/app/actions/trips';
+
+interface Props {
+  planId: string;
+  tripId: string;
+}
+
+const QUICK_SUGGESTIONS = [
+  '朝はゆっくりスタートしたい',
+  '歩く距離を減らしたい',
+  '乗り換えを少なくしたい',
+  '食事にもっと時間を取りたい',
+  '屋内スポットを増やしたい',
+  '観光スポットをもっと詰め込みたい',
+];
+
+export default function ReplanForm({ planId, tripId }: Props) {
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [resultSummary, setResultSummary] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!text.trim()) return;
+
+    setLoading(true);
+    setError('');
+    setResultSummary('');
+
+    const result = await replanTripAction(planId, text.trim());
+
+    setLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    if (result.resultSummary) {
+      setResultSummary(result.resultSummary);
+    }
+
+    if (result.newPlanId) {
+      setTimeout(() => {
+        router.push(`/trips/${tripId}/plans/${result.newPlanId}`);
+      }, 1500);
+    }
+  }
+
+  return (
+    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+      <h3 className="font-bold text-purple-800 mb-3 flex items-center gap-2">
+        <span>✨</span>
+        AIに再設計を依頼
+      </h3>
+
+      <div className="flex flex-wrap gap-2 mb-3">
+        {QUICK_SUGGESTIONS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setText(s)}
+            className="text-xs bg-white border border-purple-200 text-purple-700 px-2 py-1 rounded-full hover:bg-purple-100 transition-colors"
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={3}
+          placeholder="例: 朝はゆっくりしたい / 歩く距離を減らしたい / もっと食事を楽しみたい"
+          className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white resize-none"
+        />
+
+        {error && (
+          <p className="text-red-500 text-sm">{error}</p>
+        )}
+
+        {resultSummary && (
+          <div className="bg-purple-100 border border-purple-300 rounded-lg px-3 py-2 text-sm text-purple-800">
+            <p className="font-medium mb-1">変更内容:</p>
+            <p>{resultSummary}</p>
+            <p className="text-xs mt-1 text-purple-600">新しいプランに移動します...</p>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading || !text.trim()}
+          className="w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {loading ? 'AIが再設計中...' : '再設計する'}
+        </button>
+      </form>
+    </div>
+  );
+}

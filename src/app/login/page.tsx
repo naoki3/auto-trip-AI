@@ -13,24 +13,25 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-xl shadow p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center text-green-700 mb-6">⚽ BetPredict AI</h1>
+        <h1 className="text-2xl font-bold text-center text-blue-700 mb-1">✈️ Auto Trip AI</h1>
+        <p className="text-center text-sm text-gray-500 mb-6">AIが旅程を一気通貫で作ります</p>
         <form action={action} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ユーザー名</label>
             <input
               name="username"
               type="text"
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">パスワード</label>
             <input
               name="password"
               type="password"
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           {state?.error && (
@@ -39,14 +40,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
           >
-            {pending ? 'Logging in...' : 'Log In'}
+            {pending ? 'ログイン中...' : 'ログイン'}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-500">
-          Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-green-600 hover:underline">Sign Up</Link>
+          アカウントがない方は{' '}
+          <Link href="/register" className="text-blue-600 hover:underline">新規登録</Link>
         </p>
       </div>
     </div>

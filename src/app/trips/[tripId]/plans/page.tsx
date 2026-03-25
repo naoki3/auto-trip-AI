@@ -46,6 +46,8 @@ async function PlansContent({ tripId, userId }: { tripId: string; userId: string
     .eq('trip_id', tripId)
     .order('created_at', { ascending: true });
 
+  console.log('[plans page] tripId:', tripId, 'plans count:', plans?.length, plans?.map(p => p.plan_type));
+
   const daysLabel = trip.days === 1 ? '日帰り' : `${trip.days - 1}泊${trip.days}日`;
 
   const PLAN_ORDER = ['fastest', 'cheapest', 'relaxed', 'sightseeing'];

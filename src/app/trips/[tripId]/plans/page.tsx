@@ -113,7 +113,14 @@ async function PlansContent({ tripId, trip }: { tripId: string; trip: Record<str
       .eq('trip_id', tripId)
       .single();
 
-    const generated = await generateTripPlans(trip as never, prefData ?? {});
+    let generated;
+    try {
+      generated = await generateTripPlans(trip as never, prefData ?? {});
+      console.log('[generate] result count:', generated.length, generated.map(p => p.plan_type));
+    } catch (e) {
+      console.error('[generate] error:', e);
+      generated = [];
+    }
     for (const plan of generated) {
       await savePlan(tripId, plan);
     }

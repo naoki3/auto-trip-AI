@@ -6,22 +6,15 @@ interface Props {
   isAdmin: boolean;
 }
 
-export default function Header({ username, isAdmin }: Props) {
+export default function Header({ username, isAdmin: _isAdmin }: Props) {
   return (
-    <header className="bg-green-700 text-white shadow">
+    <header className="bg-blue-700 text-white shadow">
       <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-lg font-bold tracking-tight">BetPredict AI</Link>
-          {isAdmin && (
-            <Link href="/admin" className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded font-semibold">
-              Admin
-            </Link>
-          )}
-        </div>
+        <Link href="/" className="text-lg font-bold tracking-tight">Auto Trip AI</Link>
         <div className="flex items-center gap-4">
-          <p className="text-sm text-green-200">{username}</p>
+          <p className="text-sm text-blue-200">{username}</p>
           <form action={logout}>
-            <button type="submit" className="text-xs text-green-200 hover:text-white underline">
+            <button type="submit" className="text-xs text-blue-200 hover:text-white underline">
               Logout
             </button>
           </form>

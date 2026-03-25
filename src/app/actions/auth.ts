@@ -46,7 +46,6 @@ export async function register(formData: FormData) {
     id,
     username,
     password_hash: hash,
-    balance: 50000,
     is_admin: 0,
     created_at: new Date().toISOString(),
   });

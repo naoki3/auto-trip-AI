@@ -188,6 +188,7 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
 
   const results = await Promise.all(
     PLAN_TYPES.map(async ({ type, description }) => {
+      let rawText = '';
       try {
         const message = await client.messages.create({
           model: 'claude-sonnet-4-6',
@@ -196,15 +197,16 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
         });
         const content = message.content[0];
         if (content.type !== 'text') return null;
-        const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+        rawText = content.text;
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
-          console.error(`[ai] no JSON found for ${type}. Raw:`, content.text.slice(0, 300));
+          console.error(`[ai] no JSON found for ${type}. Raw:`, rawText.slice(0, 300));
           return null;
         }
         return JSON.parse(jsonMatch[0]) as AIPlan;
       } catch (e) {
         console.error(`[ai] error for ${type}:`, e);
-        console.error(`[ai] raw (last 200):`, content?.text?.slice(-200));
+        console.error(`[ai] raw tail:`, rawText.slice(-300));
         return null;
       }
     })

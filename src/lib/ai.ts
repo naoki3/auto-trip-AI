@@ -195,19 +195,14 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
           max_tokens: 16000,
           messages: [{ role: 'user', content: makePrompt(type, description) }],
         });
-        console.log(`[ai] ${type} stop_reason:`, message.stop_reason, 'output_tokens:', message.usage?.output_tokens);
         const content = message.content[0];
         if (content.type !== 'text') return null;
         rawText = content.text;
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-          console.error(`[ai] no JSON found for ${type}. Raw:`, rawText.slice(0, 300));
-          return null;
-        }
+        if (!jsonMatch) return null;
         return JSON.parse(jsonMatch[0]) as AIPlan;
       } catch (e) {
         console.error(`[ai] error for ${type}:`, e);
-        console.error(`[ai] raw tail:`, rawText.slice(-300));
         return null;
       }
     })

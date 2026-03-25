@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+
 import { getSession } from '@/lib/session';
 import Header from '@/components/Header';
 import TripForm from '@/components/TripForm';
@@ -18,7 +20,9 @@ export default async function NewTripPage() {
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <TripForm />
+          <Suspense>
+            <TripForm />
+          </Suspense>
         </div>
       </main>
     </div>

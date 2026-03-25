@@ -199,11 +199,18 @@ ${prefLines ? `- 追加条件: ${prefLines}` : ''}
   const content = message.content[0];
   if (content.type !== 'text') return [];
 
+  console.log('[ai] raw response (first 500):', content.text.slice(0, 500));
   try {
     const jsonMatch = content.text.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) return [];
-    return JSON.parse(jsonMatch[0]) as AIPlan[];
-  } catch {
+    if (!jsonMatch) {
+      console.error('[ai] no JSON array found in response');
+      return [];
+    }
+    const parsed = JSON.parse(jsonMatch[0]) as AIPlan[];
+    console.log('[ai] parsed plans:', parsed.length);
+    return parsed;
+  } catch (e) {
+    console.error('[ai] JSON parse error:', e);
     return [];
   }
 }

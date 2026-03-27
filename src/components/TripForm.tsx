@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { createTrip } from '@/app/actions/trips';
 import { t, type Lang } from '@/lib/i18n';
 
@@ -11,6 +11,7 @@ export default function TripForm({ lang }: { lang: Lang }) {
     async (_: State, formData: FormData) => createTrip(formData),
     null
   );
+  const [days, setDays] = useState('3');
 
   return (
     <form action={action} className="space-y-5">
@@ -59,14 +60,23 @@ export default function TripForm({ lang }: { lang: Lang }) {
           <label className="block text-sm font-medium text-gray-700 mb-1">{t('tripForm', 'days', lang)}</label>
           <select
             name="days"
+            value={days}
+            onChange={e => setDays(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           >
             <option value="1">{t('tripForm', 'dayTrip', lang)}</option>
             <option value="2">{t('tripForm', 'oneNight', lang)}</option>
-            <option value="3" defaultValue="3">{t('tripForm', 'twoNight', lang)}</option>
+            <option value="3">{t('tripForm', 'twoNight', lang)}</option>
             <option value="4">{t('tripForm', 'threeNight', lang)}</option>
             <option value="5">{t('tripForm', 'fourNight', lang)}</option>
+            <option value="6">{t('tripForm', 'fiveNight', lang)}</option>
+            <option value="7">{t('tripForm', 'sixNight', lang)}</option>
           </select>
+          {Number(days) >= 6 && (
+            <p className="mt-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+              {t('tripForm', 'longTripWarning', lang)}
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">{t('tripForm', 'transport', lang)}</label>

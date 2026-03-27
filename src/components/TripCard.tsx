@@ -18,15 +18,15 @@ export default function TripCard({ trip, lang }: Props) {
 
   const daysLabel = trip.days === 1 ? '日帰り' : `${trip.days - 1}泊${trip.days}日`;
 
-  const transportKey = ({
+  const transportKeyMap: Record<string, 'transportFlight' | 'transportTrain' | 'transportCar' | 'transportTaxi' | 'transportUndecided'> = {
     flight: 'transportFlight',
     train: 'transportTrain',
     car: 'transportCar',
     taxi: 'transportTaxi',
     undecided: 'transportUndecided',
-  } as Record<string, keyof typeof import('@/lib/i18n').translations.ja.tripCard>)[trip.main_transport] ?? 'transportUndecided';
-
-  const transportLabel = t('tripCard', transportKey as 'transportFlight', lang);
+  };
+  const transportKey = transportKeyMap[trip.main_transport] ?? 'transportUndecided';
+  const transportLabel = t('tripCard', transportKey, lang);
 
   async function handleDelete() {
     setDeleting(true);

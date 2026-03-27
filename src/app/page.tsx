@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getSession } from '@/lib/session';
 import { supabase } from '@/lib/db';
 import Header from '@/components/Header';
+import TripCard from '@/components/TripCard';
 
 export default async function Home() {
   const session = await getSession();
@@ -38,14 +39,6 @@ async function TripList({ userId }: { userId: string }) {
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
-  const TRANSPORT_LABELS: Record<string, string> = {
-    flight: '飛行機',
-    train: '電車・新幹線',
-    car: '車',
-    taxi: 'タクシー',
-    undecided: '未定',
-  };
-
   if (!trips || trips.length === 0) {
     return (
       <div className="text-center py-16 text-gray-500">
@@ -64,33 +57,9 @@ async function TripList({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-3">
-      {trips.map((trip) => {
-        const daysLabel = trip.days === 1 ? '日帰り' : `${trip.days - 1}泊${trip.days}日`;
-        return (
-          <Link
-            key={trip.id}
-            href={`/trips/${trip.id}/plans`}
-            className="block bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-bold text-gray-800">
-                  {trip.origin} → {trip.destination}
-                </p>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  {daysLabel} / {TRANSPORT_LABELS[trip.main_transport] ?? trip.main_transport}
-                </p>
-                {trip.optional_note && (
-                  <p className="text-xs text-gray-400 mt-1 truncate max-w-xs">
-                    {trip.optional_note}
-                  </p>
-                )}
-              </div>
-              <span className="text-gray-400 text-sm">→</span>
-            </div>
-          </Link>
-        );
-      })}
+      {trips.map((trip) => (
+        <TripCard key={trip.id} trip={trip} />
+      ))}
     </div>
   );
 }

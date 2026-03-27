@@ -25,6 +25,12 @@ export default async function PlansPage({ params }: Props) {
 
   if (!trip) notFound();
 
+  const { data: existingPlans } = await supabase
+    .from('plans')
+    .select('*')
+    .eq('trip_id', tripId)
+    .order('created_at', { ascending: true });
+
   const daysLabel = trip.days === 1 ? '日帰り' : `${trip.days - 1}泊${trip.days}日`;
 
   return (
@@ -40,7 +46,7 @@ export default async function PlansPage({ params }: Props) {
           </h2>
           <p className="text-sm text-gray-500 mt-0.5">{daysLabel} のプラン比較</p>
         </div>
-        <PlansLoader tripId={tripId} />
+        <PlansLoader tripId={tripId} initialPlans={existingPlans ?? []} />
       </main>
     </div>
   );

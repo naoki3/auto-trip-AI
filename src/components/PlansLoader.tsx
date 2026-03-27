@@ -8,14 +8,17 @@ const PLAN_ORDER = ['fastest', 'cheapest', 'relaxed', 'sightseeing'];
 
 interface Props {
   tripId: string;
+  initialPlans: PlanRow[];
 }
 
-export default function PlansLoader({ tripId }: Props) {
-  const [plans, setPlans] = useState<PlanRow[]>([]);
+export default function PlansLoader({ tripId, initialPlans }: Props) {
+  const [plans, setPlans] = useState<PlanRow[]>(initialPlans);
   const [error, setError] = useState(false);
   const generatingRef = useRef(false);
 
   useEffect(() => {
+    if (initialPlans.length > 0) return;
+
     let stopped = false;
 
     async function fetchPlans(): Promise<PlanRow[]> {
@@ -67,7 +70,7 @@ export default function PlansLoader({ tripId }: Props) {
 
     poll();
     return () => { stopped = true; };
-  }, [tripId]);
+  }, [tripId, initialPlans.length]);
 
   if (error) {
     return (

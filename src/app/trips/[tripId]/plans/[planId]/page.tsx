@@ -8,6 +8,7 @@ import { supabase } from '@/lib/db';
 import Header from '@/components/Header';
 import ScheduleTimeline from '@/components/ScheduleTimeline';
 import ReplanForm from '@/components/ReplanForm';
+import PlanActions from '@/components/PlanActions';
 import { t } from '@/lib/i18n';
 
 interface Props {
@@ -73,10 +74,11 @@ async function PlanDetailContent({
 
   return (
     <>
-      <div className="mb-1">
+      <div className="mb-1 flex items-center justify-between no-print">
         <Link href={`/trips/${tripId}/plans`} className="text-xs text-blue-600 hover:underline">
           {t('planDetail', 'backToPlans', lang)}
         </Link>
+        <PlanActions lang={lang} title={planLabel} />
       </div>
 
       <div className="mb-4">
@@ -114,7 +116,9 @@ async function PlanDetailContent({
         <ScheduleTimeline days={daysWithItems} lang={lang} />
       </div>
 
-      <ReplanForm planId={planId} tripId={tripId} lang={lang} />
+      <div className="no-print">
+        <ReplanForm planId={planId} tripId={tripId} lang={lang} />
+      </div>
     </>
   );
 }

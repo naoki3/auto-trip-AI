@@ -15,6 +15,18 @@ const translations = {
       title: '旅行プランを作成',
       desc: '条件を入力するとAIが4種類のプランを提案します',
     },
+    companions: {
+      label: '同行者',
+      solo: '一人旅',
+      couple: '二人旅（カップル・友人）',
+      family: '家族旅行（子連れ）',
+      group: 'グループ旅行（3人以上）',
+    },
+    planActions: {
+      share: '共有',
+      copied: 'コピーしました！',
+      print: 'PDF保存 / 印刷',
+    },
     tripForm: {
       origin: '出発地',
       originPlaceholder: '例: 東京駅、羽田空港',
@@ -137,6 +149,18 @@ const translations = {
   en: {
     common: { loading: 'Loading...', appName: 'Auto Trip AI' },
     header: { logout: 'Logout' },
+    companions: {
+      label: 'Companions',
+      solo: 'Solo',
+      couple: 'Two people (couple / friends)',
+      family: 'Family (with children)',
+      group: 'Group (3+ people)',
+    },
+    planActions: {
+      share: 'Share',
+      copied: 'Copied!',
+      print: 'Save PDF / Print',
+    },
     tripList: {
       title: 'My Trips',
       newTrip: '+ Plan New Trip',

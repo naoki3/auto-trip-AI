@@ -79,7 +79,7 @@ export default function ReplanForm({ planId, tripId }: Props) {
           onChange={(e) => setText(e.target.value)}
           rows={3}
           placeholder="例: 朝はゆっくりしたい / 歩く距離を減らしたい / もっと食事を楽しみたい"
-          className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white resize-none"
+          className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white resize-none text-gray-900"
         />
 
         {error && (

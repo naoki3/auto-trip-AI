@@ -23,7 +23,7 @@ export default function TripForm() {
             type="text"
             required
             placeholder="例: 東京駅、羽田空港"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           />
         </div>
         <div>
@@ -35,7 +35,7 @@ export default function TripForm() {
             type="text"
             required
             placeholder="例: 京都、福岡、沖縄"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           />
         </div>
       </div>
@@ -45,7 +45,7 @@ export default function TripForm() {
           <label className="block text-sm font-medium text-gray-700 mb-1">日数</label>
           <select
             name="days"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           >
             <option value="1">日帰り</option>
             <option value="2">1泊2日</option>
@@ -58,7 +58,7 @@ export default function TripForm() {
           <label className="block text-sm font-medium text-gray-700 mb-1">主な移動手段</label>
           <select
             name="main_transport"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           >
             <option value="undecided">未定</option>
             <option value="train">電車・新幹線</option>
@@ -71,7 +71,7 @@ export default function TripForm() {
           <label className="block text-sm font-medium text-gray-700 mb-1">荷物レベル</label>
           <select
             name="luggage_level"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           >
             <option value="light">軽い（リュックのみ）</option>
             <option value="normal" defaultValue="normal">普通（スーツケース小）</option>

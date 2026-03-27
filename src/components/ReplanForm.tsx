@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { replanTripAction } from '@/app/actions/trips';
 
 interface Props {
   planId: string;
@@ -33,22 +32,29 @@ export default function ReplanForm({ planId, tripId }: Props) {
     setError('');
     setResultSummary('');
 
-    const result = await replanTripAction(planId, text.trim());
+    const res = await fetch(`/api/plans/${planId}/replan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_text: text.trim() }),
+    });
 
     setLoading(false);
 
-    if (result.error) {
-      setError(result.error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? '再設計に失敗しました');
       return;
     }
 
-    if (result.resultSummary) {
-      setResultSummary(result.resultSummary);
+    const data = await res.json();
+
+    if (data.result_summary) {
+      setResultSummary(data.result_summary);
     }
 
-    if (result.newPlanId) {
+    if (data.new_plan_id) {
       setTimeout(() => {
-        router.push(`/trips/${tripId}/plans/${result.newPlanId}`);
+        router.push(`/trips/${tripId}/plans/${data.new_plan_id}`);
       }, 1500);
     }
   }

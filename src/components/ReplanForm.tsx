@@ -2,27 +2,22 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { t, getReplanSuggestions, type Lang } from '@/lib/i18n';
 
 interface Props {
   planId: string;
   tripId: string;
+  lang: Lang;
 }
 
-const QUICK_SUGGESTIONS = [
-  '朝はゆっくりスタートしたい',
-  '歩く距離を減らしたい',
-  '乗り換えを少なくしたい',
-  '食事にもっと時間を取りたい',
-  '屋内スポットを増やしたい',
-  '観光スポットをもっと詰め込みたい',
-];
-
-export default function ReplanForm({ planId, tripId }: Props) {
+export default function ReplanForm({ planId, tripId, lang }: Props) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [resultSummary, setResultSummary] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  const suggestions = getReplanSuggestions(lang);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +37,7 @@ export default function ReplanForm({ planId, tripId }: Props) {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? '再設計に失敗しました');
+      setError(data.error ?? t('replan', 'errorDefault', lang));
       return;
     }
 
@@ -63,11 +58,11 @@ export default function ReplanForm({ planId, tripId }: Props) {
     <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
       <h3 className="font-bold text-purple-800 mb-3 flex items-center gap-2">
         <span>✨</span>
-        AIに再設計を依頼
+        {t('replan', 'title', lang)}
       </h3>
 
       <div className="flex flex-wrap gap-2 mb-3">
-        {QUICK_SUGGESTIONS.map((s) => (
+        {suggestions.map((s) => (
           <button
             key={s}
             type="button"
@@ -84,7 +79,7 @@ export default function ReplanForm({ planId, tripId }: Props) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={3}
-          placeholder="例: 朝はゆっくりしたい / 歩く距離を減らしたい / もっと食事を楽しみたい"
+          placeholder={t('replan', 'placeholder', lang)}
           className="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white resize-none text-gray-900"
         />
 
@@ -94,9 +89,9 @@ export default function ReplanForm({ planId, tripId }: Props) {
 
         {resultSummary && (
           <div className="bg-purple-100 border border-purple-300 rounded-lg px-3 py-2 text-sm text-purple-800">
-            <p className="font-medium mb-1">変更内容:</p>
+            <p className="font-medium mb-1">{t('replan', 'changesLabel', lang)}</p>
             <p>{resultSummary}</p>
-            <p className="text-xs mt-1 text-purple-600">新しいプランに移動します...</p>
+            <p className="text-xs mt-1 text-purple-600">{t('replan', 'redirecting', lang)}</p>
           </div>
         )}
 
@@ -105,7 +100,7 @@ export default function ReplanForm({ planId, tripId }: Props) {
           disabled={loading || !text.trim()}
           className="w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'AIが再設計中...' : '再設計する'}
+          {loading ? t('replan', 'submitting', lang) : t('replan', 'submit', lang)}
         </button>
       </form>
     </div>

@@ -56,7 +56,9 @@ export async function createTrip(formData: FormData) {
   const days = Number(formData.get('days') ?? 1);
   const main_transport = String(formData.get('main_transport') ?? 'undecided');
   const luggage_level = String(formData.get('luggage_level') ?? 'normal');
-  const optional_note = String(formData.get('optional_note') ?? '').trim() || null;
+  const companions = String(formData.get('companions') ?? '').trim() || null;
+  const note = String(formData.get('optional_note') ?? '').trim() || null;
+  const optional_note = [companions ? `同行者: ${companions}` : null, note].filter(Boolean).join('\n') || null;
 
   if (!origin || !destination) return { error: '出発地と目的地を入力してください' };
 

@@ -8,6 +8,15 @@ const ITEM_TYPE_CONFIG = {
   luggage: { icon: '🧳', color: 'border-yellow-300 bg-yellow-50' },
 };
 
+const METHOD_ICONS: Record<string, string> = {
+  train: '🚃',
+  bus: '🚌',
+  walk: '🚶',
+  taxi: '🚕',
+  flight: '✈️',
+  car: '🚗',
+};
+
 const METHOD_LABELS: Record<string, string> = {
   train: '電車',
   bus: 'バス',
@@ -75,12 +84,15 @@ function LuggageDetail({ item }: { item: ItineraryItemRow }) {
 
 function TimelineItem({ item }: { item: ItineraryItemRow }) {
   const config = ITEM_TYPE_CONFIG[item.item_type] ?? ITEM_TYPE_CONFIG.spot;
+  const icon = item.item_type === 'move' && item.metadata_json
+    ? (METHOD_ICONS[(JSON.parse(item.metadata_json) as MoveMetadata).method] ?? config.icon)
+    : config.icon;
 
   return (
     <div className="flex gap-3">
       <div className="flex flex-col items-center">
         <div className="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-sm flex-shrink-0">
-          {config.icon}
+          {icon}
         </div>
         <div className="w-0.5 bg-gray-200 flex-1 mt-1" />
       </div>

@@ -4,25 +4,29 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { TripRow } from '@/lib/db';
-
-const TRANSPORT_LABELS: Record<string, string> = {
-  flight: '飛行機',
-  train: '電車・新幹線',
-  car: '車',
-  taxi: 'タクシー',
-  undecided: '未定',
-};
+import { t, type Lang } from '@/lib/i18n';
 
 interface Props {
   trip: TripRow;
+  lang: Lang;
 }
 
-export default function TripCard({ trip }: Props) {
+export default function TripCard({ trip, lang }: Props) {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   const daysLabel = trip.days === 1 ? '日帰り' : `${trip.days - 1}泊${trip.days}日`;
+
+  const transportKey = ({
+    flight: 'transportFlight',
+    train: 'transportTrain',
+    car: 'transportCar',
+    taxi: 'transportTaxi',
+    undecided: 'transportUndecided',
+  } as Record<string, keyof typeof import('@/lib/i18n').translations.ja.tripCard>)[trip.main_transport] ?? 'transportUndecided';
+
+  const transportLabel = t('tripCard', transportKey as 'transportFlight', lang);
 
   async function handleDelete() {
     setDeleting(true);
@@ -34,7 +38,7 @@ export default function TripCard({ trip }: Props) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-red-200 p-4">
         <p className="text-sm text-gray-700 mb-3">
-          <span className="font-medium">{trip.origin} → {trip.destination}</span> を削除しますか？
+          <span className="font-medium">{trip.origin} → {trip.destination}</span>{t('tripCard', 'deleteConfirmSuffix', lang)}
         </p>
         <div className="flex gap-2">
           <button
@@ -42,13 +46,13 @@ export default function TripCard({ trip }: Props) {
             disabled={deleting}
             className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-red-600 disabled:opacity-50 transition-colors"
           >
-            {deleting ? '削除中...' : '削除する'}
+            {deleting ? t('tripCard', 'deleting', lang) : t('tripCard', 'deleteBtn', lang)}
           </button>
           <button
             onClick={() => setConfirming(false)}
             className="px-4 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            キャンセル
+            {t('tripCard', 'cancelBtn', lang)}
           </button>
         </div>
       </div>
@@ -62,7 +66,7 @@ export default function TripCard({ trip }: Props) {
           {trip.origin} → {trip.destination}
         </p>
         <p className="text-sm text-gray-500 mt-0.5">
-          {daysLabel} / {TRANSPORT_LABELS[trip.main_transport] ?? trip.main_transport}
+          {daysLabel} / {transportLabel}
         </p>
         {trip.optional_note && (
           <p className="text-xs text-gray-400 mt-1 truncate">

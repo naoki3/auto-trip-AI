@@ -3,34 +3,30 @@ import { redirect, notFound } from 'next/navigation';
 
 import Link from 'next/link';
 import { getSession } from '@/lib/session';
+import { getLang } from '@/lib/lang';
 import { supabase } from '@/lib/db';
 import Header from '@/components/Header';
 import ScheduleTimeline from '@/components/ScheduleTimeline';
 import ReplanForm from '@/components/ReplanForm';
+import { t } from '@/lib/i18n';
 
 interface Props {
   params: Promise<{ tripId: string; planId: string }>;
 }
-
-const PLAN_TYPE_LABELS: Record<string, string> = {
-  fastest: '最短プラン',
-  cheapest: '最安プラン',
-  relaxed: '楽・荷物考慮プラン',
-  sightseeing: '観光重視プラン',
-};
 
 export default async function PlanDetailPage({ params }: Props) {
   const session = await getSession();
   if (!session) redirect('/login');
 
   const { tripId, planId } = await params;
+  const lang = await getLang();
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header username={session.username} isAdmin={session.isAdmin} />
+      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} />
       <main className="max-w-2xl mx-auto px-4 py-6">
-        <Suspense fallback={<div className="text-center py-12 text-gray-400">読み込み中...</div>}>
-          <PlanDetailContent tripId={tripId} planId={planId} userId={session.userId} />
+        <Suspense fallback={<div className="text-center py-12 text-gray-400">{t('common', 'loading', lang)}</div>}>
+          <PlanDetailContent tripId={tripId} planId={planId} userId={session.userId} lang={lang} />
         </Suspense>
       </main>
     </div>
@@ -41,10 +37,12 @@ async function PlanDetailContent({
   tripId,
   planId,
   userId,
+  lang,
 }: {
   tripId: string;
   planId: string;
   userId: string;
+  lang: Parameters<typeof t>[2];
 }) {
   const [{ data: trip }, { data: plan }] = await Promise.all([
     supabase.from('trips').select('*').eq('id', tripId).eq('user_id', userId).single(),
@@ -71,13 +69,13 @@ async function PlanDetailContent({
   );
 
   const daysLabel = trip.days === 1 ? '日帰り' : `${trip.days - 1}泊${trip.days}日`;
-  const planLabel = PLAN_TYPE_LABELS[plan.plan_type] ?? plan.plan_type;
+  const planLabel = t('planDetail', plan.plan_type as 'fastest' | 'cheapest' | 'relaxed' | 'sightseeing', lang);
 
   return (
     <>
       <div className="mb-1">
         <Link href={`/trips/${tripId}/plans`} className="text-xs text-blue-600 hover:underline">
-          ← プラン一覧に戻る
+          {t('planDetail', 'backToPlans', lang)}
         </Link>
       </div>
 
@@ -102,21 +100,21 @@ async function PlanDetailContent({
         )}
         {plan.transfer_count != null && (
           <span className="bg-white border rounded-full px-3 py-1">
-            🔁 乗り換え {plan.transfer_count}回
+            🔁 {t('planDetail', 'transfersLabel', lang)}{plan.transfer_count}{t('planDetail', 'transfersUnit', lang)}
           </span>
         )}
         {plan.walking_score != null && (
           <span className="bg-white border rounded-full px-3 py-1">
-            🚶 歩き {plan.walking_score}/10
+            🚶 {t('planDetail', 'walkingLabel', lang)} {plan.walking_score}/10
           </span>
         )}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
-        <ScheduleTimeline days={daysWithItems} />
+        <ScheduleTimeline days={daysWithItems} lang={lang} />
       </div>
 
-      <ReplanForm planId={planId} tripId={tripId} />
+      <ReplanForm planId={planId} tripId={tripId} lang={lang} />
     </>
   );
 }

@@ -42,6 +42,7 @@ async function TripList({ userId }: { userId: string }) {
     flight: '飛行機',
     train: '電車・新幹線',
     car: '車',
+    taxi: 'タクシー',
     undecided: '未定',
   };
 

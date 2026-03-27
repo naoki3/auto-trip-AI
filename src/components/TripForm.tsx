@@ -64,6 +64,7 @@ export default function TripForm() {
             <option value="train">電車・新幹線</option>
             <option value="flight">飛行機</option>
             <option value="car">車</option>
+            <option value="taxi">タクシー</option>
           </select>
         </div>
         <div>

@@ -116,11 +116,18 @@ export async function replanTripAction(
 
   if (!trip) return { error: '旅行が見つかりません' };
 
+  const { data: prefData } = await supabase
+    .from('trip_preferences')
+    .select('*')
+    .eq('trip_id', trip.id)
+    .single();
+
   const existingPlanSummary = plan.summary ?? '';
   const { plans, parsedConditions, resultSummary } = await replanTrip(
     trip,
     existingPlanSummary,
-    userRequest
+    userRequest,
+    prefData ?? {}
   );
 
   if (plans.length === 0) return { error: '再設計に失敗しました' };

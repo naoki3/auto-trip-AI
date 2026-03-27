@@ -64,10 +64,17 @@ export async function POST(
   const { data: trip } = await supabase.from('trips').select('*').eq('id', plan.trip_id).single();
   if (!trip) return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
 
+  const { data: prefData } = await supabase
+    .from('trip_preferences')
+    .select('*')
+    .eq('trip_id', trip.id)
+    .single();
+
   const { plans, parsedConditions, resultSummary } = await replanTrip(
     trip,
     plan.summary ?? '',
-    user_text
+    user_text,
+    prefData ?? {}
   );
 
   if (plans.length === 0) {

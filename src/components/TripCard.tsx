@@ -30,53 +30,58 @@ export default function TripCard({ trip }: Props) {
     router.refresh();
   }
 
-  return (
-    <div className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
-      <Link href={`/trips/${trip.id}/plans`} className="block">
-        <div className="flex items-start justify-between pr-8">
-          <div>
-            <p className="font-bold text-gray-800">
-              {trip.origin} → {trip.destination}
-            </p>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {daysLabel} / {TRANSPORT_LABELS[trip.main_transport] ?? trip.main_transport}
-            </p>
-            {trip.optional_note && (
-              <p className="text-xs text-gray-400 mt-1 truncate max-w-xs">
-                {trip.optional_note}
-              </p>
-            )}
-          </div>
-          <span className="text-gray-400 text-sm">→</span>
-        </div>
-      </Link>
-
-      {!confirming ? (
-        <button
-          onClick={() => setConfirming(true)}
-          className="absolute top-3 right-10 text-gray-300 hover:text-red-400 transition-colors text-lg leading-none"
-          aria-label="削除"
-        >
-          ×
-        </button>
-      ) : (
-        <div className="mt-3 flex items-center gap-2 text-sm">
-          <span className="text-gray-500">削除しますか？</span>
+  if (confirming) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-red-200 p-4">
+        <p className="text-sm text-gray-700 mb-3">
+          <span className="font-medium">{trip.origin} → {trip.destination}</span> を削除しますか？
+        </p>
+        <div className="flex gap-2">
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors"
+            className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-red-600 disabled:opacity-50 transition-colors"
           >
-            {deleting ? '削除中...' : '削除'}
+            {deleting ? '削除中...' : '削除する'}
           </button>
           <button
             onClick={() => setConfirming(false)}
-            className="text-gray-400 hover:text-gray-600 px-2 py-1"
+            className="px-4 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors"
           >
             キャンセル
           </button>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="group bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow flex items-center gap-3">
+      <Link href={`/trips/${trip.id}/plans`} className="flex-1 min-w-0">
+        <p className="font-bold text-gray-800">
+          {trip.origin} → {trip.destination}
+        </p>
+        <p className="text-sm text-gray-500 mt-0.5">
+          {daysLabel} / {TRANSPORT_LABELS[trip.main_transport] ?? trip.main_transport}
+        </p>
+        {trip.optional_note && (
+          <p className="text-xs text-gray-400 mt-1 truncate">
+            {trip.optional_note}
+          </p>
+        )}
+      </Link>
+      <button
+        onClick={() => setConfirming(true)}
+        className="shrink-0 text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+        aria-label="削除"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14H6L5 6" />
+          <path d="M10 11v6M14 11v6" />
+          <path d="M9 6V4h6v2" />
+        </svg>
+      </button>
     </div>
   );
 }

@@ -78,7 +78,7 @@ const PLAN_ITEM_SCHEMA = `{
           "metadata_json": {
             "from": "出発地",
             "to": "到着地",
-            "method": "train",
+            "method": "train（train/bus/walk/taxi/flight/car のいずれか）",
             "duration_minutes": 90,
             "price": 1500,
             "transfer_count": 1,

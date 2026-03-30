@@ -2,7 +2,12 @@
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT,
+  email TEXT UNIQUE,
+  google_id TEXT UNIQUE,
+  stripe_customer_id TEXT UNIQUE,
+  subscription_status TEXT NOT NULL DEFAULT 'free',
+  subscription_end_date TEXT,
   is_admin INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL
 );

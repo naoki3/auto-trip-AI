@@ -16,6 +16,9 @@ export default function Header({ username, isAdmin: _isAdmin, lang }: Props) {
         <Link href="/" className="text-lg font-bold tracking-tight">{t('common', 'appName', lang)}</Link>
         <div className="flex items-center gap-3">
           <LangToggle lang={lang} />
+          <Link href="/billing" className="text-xs text-blue-200 hover:text-white">
+            {lang === 'ja' ? 'プラン' : 'Billing'}
+          </Link>
           <p className="text-sm text-blue-200">{username}</p>
           <form action={logout}>
             <button type="submit" className="text-xs text-blue-200 hover:text-white underline">

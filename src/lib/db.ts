@@ -23,7 +23,12 @@ export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
 export interface UserRow {
   id: string;
   username: string;
-  password_hash: string;
+  password_hash: string | null;
+  email: string | null;
+  google_id: string | null;
+  stripe_customer_id: string | null;
+  subscription_status: 'free' | 'active' | 'canceled' | 'past_due';
+  subscription_end_date: string | null;
   is_admin: number;
   created_at: string;
 }

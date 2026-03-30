@@ -4,10 +4,11 @@ let _client: SupabaseClient | undefined;
 
 function getClient(): SupabaseClient {
   if (!_client) {
-    _client = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!
-    );
+    // Use service_role key on the server so we bypass RLS.
+    // RLS is enabled on all tables with no permissive policies,
+    // so the anon key cannot access any data even if leaked.
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY!;
+    _client = createClient(process.env.SUPABASE_URL!, key);
   }
   return _client;
 }

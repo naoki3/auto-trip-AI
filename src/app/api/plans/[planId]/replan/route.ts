@@ -61,7 +61,12 @@ export async function POST(
   const { data: plan } = await supabase.from('plans').select('*').eq('id', planId).single();
   if (!plan) return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
 
-  const { data: trip } = await supabase.from('trips').select('*').eq('id', plan.trip_id).single();
+  const { data: trip } = await supabase
+    .from('trips')
+    .select('*')
+    .eq('id', plan.trip_id)
+    .eq('user_id', session.userId)
+    .single();
   if (!trip) return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
 
   const { data: prefData } = await supabase

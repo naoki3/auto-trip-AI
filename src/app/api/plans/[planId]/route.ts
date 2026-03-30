@@ -14,6 +14,15 @@ export async function GET(
   const { data: plan } = await supabase.from('plans').select('*').eq('id', planId).single();
   if (!plan) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
+  // Verify ownership via parent trip
+  const { data: trip } = await supabase
+    .from('trips')
+    .select('id')
+    .eq('id', plan.trip_id)
+    .eq('user_id', session.userId)
+    .single();
+  if (!trip) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
   const { data: days } = await supabase
     .from('itinerary_days')
     .select('*')

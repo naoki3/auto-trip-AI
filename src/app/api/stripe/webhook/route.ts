@@ -20,15 +20,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
+  console.log(`[webhook] received: ${event.type}`);
+
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const customerId = session.customer as string;
-      if (customerId) {
+      const userId = session.metadata?.userId;
+      if (userId) {
         await supabase
           .from('users')
           .update({ subscription_status: 'active', stripe_customer_id: customerId })
-          .eq('stripe_customer_id', customerId);
+          .eq('id', userId);
       }
       break;
     }

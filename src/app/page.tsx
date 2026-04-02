@@ -16,7 +16,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} />
+      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} userId={session.userId} />
       <main className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-gray-800">{t('tripList', 'title', lang)}</h2>

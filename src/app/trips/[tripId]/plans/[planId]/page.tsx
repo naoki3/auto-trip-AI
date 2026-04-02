@@ -24,7 +24,7 @@ export default async function PlanDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} />
+      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} userId={session.userId} />
       <main className="max-w-2xl mx-auto px-4 py-6">
         <Suspense fallback={<div className="text-center py-12 text-gray-400">{t('common', 'loading', lang)}</div>}>
           <PlanDetailContent tripId={tripId} planId={planId} userId={session.userId} lang={lang} />

@@ -38,7 +38,7 @@ export default async function PlansPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} />
+      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} userId={session.userId} />
       <main className="max-w-2xl mx-auto px-4 py-6">
         <div className="mb-1">
           <Link href="/" className="text-xs text-blue-600 hover:underline">{t('plansPage', 'backToList', lang)}</Link>

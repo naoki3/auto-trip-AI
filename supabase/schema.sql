@@ -2,7 +2,14 @@
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT,
+  email TEXT UNIQUE,
+  google_id TEXT UNIQUE,
+  stripe_customer_id TEXT UNIQUE,
+  subscription_status TEXT NOT NULL DEFAULT 'free',
+  subscription_end_date TEXT,
+  email_verified INTEGER NOT NULL DEFAULT 0,
+  email_verification_token TEXT,
   is_admin INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL
 );
@@ -80,3 +87,20 @@ CREATE TABLE IF NOT EXISTS replanning_requests (
   new_plan_id TEXT REFERENCES plans(id),
   created_at TEXT NOT NULL
 );
+
+-- ============================================================
+-- Row Level Security
+-- All tables enable RLS with no policies, which denies all
+-- access for the anon role by default. The server uses the
+-- service_role key (bypasses RLS) so application-level auth
+-- checks remain the single source of truth.
+-- ============================================================
+
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trip_preferences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE itinerary_days ENABLE ROW LEVEL SECURITY;
+ALTER TABLE itinerary_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE replanning_requests ENABLE ROW LEVEL SECURITY;
+

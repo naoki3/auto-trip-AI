@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { checkTripLimit } from '@/lib/trip-limits';
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -12,6 +13,9 @@ export async function POST(req: NextRequest) {
   if (!origin || !destination) {
     return NextResponse.json({ error: 'origin and destination are required' }, { status: 400 });
   }
+
+  const { allowed, message } = await checkTripLimit(session.userId);
+  if (!allowed) return NextResponse.json({ error: message }, { status: 403 });
 
   const id = crypto.randomUUID();
   const { error } = await supabase.from('trips').insert({

@@ -14,7 +14,7 @@ export default async function NewTripPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} />
+      <Header username={session.username} isAdmin={session.isAdmin} lang={lang} userId={session.userId} />
       <main className="max-w-2xl mx-auto px-4 py-6">
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-800">{t('newTrip', 'title', lang)}</h2>

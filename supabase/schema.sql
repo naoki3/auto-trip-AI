@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
   stripe_customer_id TEXT UNIQUE,
   subscription_status TEXT NOT NULL DEFAULT 'free',
   subscription_end_date TEXT,
+  email_verified INTEGER NOT NULL DEFAULT 0,
+  email_verification_token TEXT,
   is_admin INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL
 );

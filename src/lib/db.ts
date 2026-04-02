@@ -30,6 +30,8 @@ export interface UserRow {
   stripe_customer_id: string | null;
   subscription_status: 'free' | 'active' | 'canceled' | 'past_due';
   subscription_end_date: string | null;
+  email_verified: number;
+  email_verification_token: string | null;
   is_admin: number;
   created_at: string;
 }

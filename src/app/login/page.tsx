@@ -1,20 +1,34 @@
 'use client';
 
 import { useActionState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { login } from '@/app/actions/auth';
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, action, pending] = useActionState(
     async (_: unknown, formData: FormData) => login(formData),
     null
   );
+  const searchParams = useSearchParams();
+  const verified = searchParams.get('verified');
+  const error = searchParams.get('error');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-xl shadow p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center text-blue-700 mb-1">✈️ Auto Trip AI</h1>
-        <p className="text-center text-sm text-gray-500 mb-6">AIが旅程を一気通貫で作ります</p>
+    <div className="bg-white rounded-xl shadow p-8 w-full max-w-sm">
+      <h1 className="text-2xl font-bold text-center text-blue-700 mb-1">✈️ Auto Trip AI</h1>
+      <p className="text-center text-sm text-gray-500 mb-6">AIが旅程を一気通貫で作ります</p>
+      {verified === '1' && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-green-700 text-sm">
+          メールアドレスの認証が完了しました。ログインしてください。
+        </div>
+      )}
+      {error === 'invalid_token' && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-red-600 text-sm">
+          認証リンクが無効または期限切れです。再度登録してください。
+        </div>
+      )}
         <form action={action} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ユーザー名</label>
@@ -72,6 +86,15 @@ export default function LoginPage() {
           <Link href="/register" className="text-blue-600 hover:underline">新規登録</Link>
         </p>
       </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Suspense fallback={<div className="bg-white rounded-xl shadow p-8 w-full max-w-sm" />}>
+        <LoginForm />
+      </Suspense>
     </div>
   );
 }

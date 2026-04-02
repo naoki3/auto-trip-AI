@@ -21,6 +21,18 @@ export async function POST(request: NextRequest) {
   }
 
   switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const customerId = session.customer as string;
+      if (customerId) {
+        await supabase
+          .from('users')
+          .update({ subscription_status: 'active', stripe_customer_id: customerId })
+          .eq('stripe_customer_id', customerId);
+      }
+      break;
+    }
+
     case 'customer.subscription.created':
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;

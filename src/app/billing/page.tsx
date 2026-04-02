@@ -12,12 +12,20 @@ function BillingContent() {
 
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (success) {
+      // Sync subscription status from Stripe after successful checkout
+      fetch('/api/stripe/sync', { method: 'POST' })
+        .then((r) => r.json())
+        .then((d) => setSubscriptionStatus(d.subscription_status ?? null))
+        .catch(() => null);
       window.history.replaceState({}, '', '/billing');
     }
   }, [success]);
+
+  const isPro = subscriptionStatus === 'active';
 
   async function handleCheckout() {
     setLoading(true);
@@ -74,7 +82,7 @@ function BillingContent() {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-gray-800">無料プラン</h2>
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">現在のプラン</span>
+              {!isPro && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">現在のプラン</span>}
             </div>
             <p className="text-3xl font-bold text-gray-900 mb-1">¥0<span className="text-base font-normal text-gray-500">/月</span></p>
             <ul className="mt-4 space-y-2 text-sm text-gray-600">
@@ -92,6 +100,7 @@ function BillingContent() {
             </div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-gray-800">Pro プラン</h2>
+              {isPro && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">現在のプラン</span>}
             </div>
             <p className="text-3xl font-bold text-gray-900 mb-1">¥1,000<span className="text-base font-normal text-gray-500">/月</span></p>
             <ul className="mt-4 space-y-2 text-sm text-gray-600 mb-6">
@@ -100,13 +109,15 @@ function BillingContent() {
               <li className="flex items-center gap-2"><span className="text-green-500">✓</span>無制限プラン作成</li>
               <li className="flex items-center gap-2"><span className="text-green-500">✓</span>優先サポート</li>
             </ul>
-            <button
-              onClick={handleCheckout}
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {loading ? '処理中...' : 'Pro にアップグレード'}
-            </button>
+            {!isPro && (
+              <button
+                onClick={handleCheckout}
+                disabled={loading}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                {loading ? '処理中...' : 'Pro にアップグレード'}
+              </button>
+            )}
           </div>
         </div>
 

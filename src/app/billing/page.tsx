@@ -86,9 +86,9 @@ function BillingContent() {
             </div>
             <p className="text-3xl font-bold text-gray-900 mb-1">¥0<span className="text-base font-normal text-gray-500">/月</span></p>
             <ul className="mt-4 space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2"><span className="text-green-500">✓</span>旅行プラン作成 3件まで</li>
+              <li className="flex items-center gap-2"><span className="text-green-500">✓</span>旅行作成 月3件まで</li>
               <li className="flex items-center gap-2"><span className="text-green-500">✓</span>AIプラン生成</li>
-              <li className="flex items-center gap-2"><span className="text-gray-400">✗</span>無制限プラン作成</li>
+              <li className="flex items-center gap-2"><span className="text-gray-400">✗</span>月50件まで作成</li>
               <li className="flex items-center gap-2"><span className="text-gray-400">✗</span>優先サポート</li>
             </ul>
           </div>
@@ -104,9 +104,9 @@ function BillingContent() {
             </div>
             <p className="text-3xl font-bold text-gray-900 mb-1">¥1,000<span className="text-base font-normal text-gray-500">/月</span></p>
             <ul className="mt-4 space-y-2 text-sm text-gray-600 mb-6">
-              <li className="flex items-center gap-2"><span className="text-green-500">✓</span>旅行プラン作成 無制限</li>
+              <li className="flex items-center gap-2"><span className="text-green-500">✓</span>旅行作成 月50件まで</li>
               <li className="flex items-center gap-2"><span className="text-green-500">✓</span>AIプラン生成</li>
-              <li className="flex items-center gap-2"><span className="text-green-500">✓</span>無制限プラン作成</li>
+              <li className="flex items-center gap-2"><span className="text-green-500">✓</span>月50件まで作成</li>
               <li className="flex items-center gap-2"><span className="text-green-500">✓</span>優先サポート</li>
             </ul>
             {!isPro && (

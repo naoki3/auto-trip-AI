@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { supabase } from '@/lib/db';
 import { getSession } from '@/lib/session';
 import { parseUserIntent, replanTrip, AIPlan } from '@/lib/ai';
+import { checkTripLimit } from '@/lib/trip-limits';
 
 async function savePlan(tripId: string, plan: AIPlan): Promise<string> {
   const planId = crypto.randomUUID();
@@ -61,6 +62,9 @@ export async function createTrip(formData: FormData) {
   const optional_note = [companions ? `同行者: ${companions}` : null, note].filter(Boolean).join('\n') || null;
 
   if (!origin || !destination) return { error: '出発地と目的地を入力してください' };
+
+  const { allowed, message } = await checkTripLimit(session.userId);
+  if (!allowed) return { error: message };
 
   const tripId = crypto.randomUUID();
   const { error } = await supabase.from('trips').insert({

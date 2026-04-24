@@ -54,15 +54,18 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Default Admin Account
+### Initial Admin Account
 
-On first run, an admin account is created automatically:
+Set the following variables in `.env.local` before the first startup.
+On boot, the server creates an admin account only if no admin exists yet.
 
-| Username | Password   |
-|----------|------------|
-| `admin`  | `admin123` |
+```env
+INIT_ADMIN_USERNAME=your_admin_name
+INIT_ADMIN_PASSWORD=a_strong_password_12chars_min
+INIT_ADMIN_EMAIL=admin@example.com   # optional
+```
 
-**Change this password before deploying.**
+If these variables are absent, no admin account is created automatically — you must add them before the first run. `INIT_ADMIN_PASSWORD` must be at least 12 characters.
 
 ## Usage
 
@@ -126,12 +129,24 @@ src/
 
 ## Environment Variables
 
-| Variable            | Required | Description                              |
-|---------------------|----------|------------------------------------------|
-| `SUPABASE_URL`      | Yes      | Your Supabase project URL                |
-| `SUPABASE_ANON_KEY` | Yes      | Supabase anon/public key                 |
-| `ANTHROPIC_API_KEY` | Yes      | Anthropic API key for Claude Haiku       |
-| `SESSION_SECRET`    | Yes      | Secret for HMAC session cookie signing   |
+| Variable                    | Required | Description                                                    |
+|-----------------------------|----------|----------------------------------------------------------------|
+| `SUPABASE_URL`              | Yes      | Your Supabase project URL                                      |
+| `SUPABASE_ANON_KEY`         | Yes      | Supabase anon/public key                                       |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes      | Supabase service role key (bypasses RLS for server operations) |
+| `ANTHROPIC_API_KEY`         | Yes      | Anthropic API key for Claude Haiku                             |
+| `SESSION_SECRET`            | Yes      | Long random string for HMAC session cookie signing             |
+| `INIT_ADMIN_USERNAME`       | No       | Username for the initial admin account (created once on boot)  |
+| `INIT_ADMIN_PASSWORD`       | No       | Password for the initial admin (≥12 chars). Required if username is set. |
+| `INIT_ADMIN_EMAIL`          | No       | Email for the initial admin account (optional)                 |
+| `GOOGLE_CLIENT_ID`          | No       | Google OAuth client ID                                         |
+| `GOOGLE_CLIENT_SECRET`      | No       | Google OAuth client secret                                     |
+| `STRIPE_SECRET_KEY`         | No       | Stripe secret key                                              |
+| `STRIPE_PRICE_ID`           | No       | Stripe product price ID                                        |
+| `STRIPE_WEBHOOK_SECRET`     | No       | Stripe webhook signature secret                                |
+| `RESEND_API_KEY`            | No       | Email service API key (Resend)                                 |
+| `EMAIL_FROM`                | No       | Sender address for verification emails                         |
+| `NEXT_PUBLIC_BASE_URL`      | No       | Public base URL of the app (e.g. `https://trip-ai.xyz`)        |
 
 ## AI Cost Estimate
 

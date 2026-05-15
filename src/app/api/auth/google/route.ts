@@ -1,8 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { cookies } from 'next/headers';
 
-export async function GET() {
+function getBaseUrl(request: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+  const host = request.headers.get('host') ?? 'localhost:3000';
+  const proto = request.headers.get('x-forwarded-proto') ?? 'http';
+  return `${proto}://${host}`;
+}
+
+export async function GET(request: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
     return NextResponse.json({ error: 'Google OAuth not configured' }, { status: 500 });
@@ -17,7 +26,7 @@ export async function GET() {
     maxAge: 60 * 10, // 10 minutes
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+  const baseUrl = getBaseUrl(request);
   const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
   const params = new URLSearchParams({

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const host = request.headers.get('host') ?? 'localhost:3000';
   const proto = request.headers.get('x-forwarded-proto') ?? 'http';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${proto}://${host}`;
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? `${proto}://${host}`).replace(/\/$/, '');
   const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
   if (!clientId || !clientSecret) {

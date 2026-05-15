@@ -3,8 +3,9 @@ import { randomBytes } from 'crypto';
 import { cookies } from 'next/headers';
 
 function getBaseUrl(request: NextRequest): string {
-  if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL;
+  const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/$/, '');
   }
   const host = request.headers.get('host') ?? 'localhost:3000';
   const proto = request.headers.get('x-forwarded-proto') ?? 'http';
